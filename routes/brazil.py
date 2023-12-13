@@ -1,5 +1,5 @@
-from services.brazilData import request_brazil_covid_data
-from flask import Blueprint
+from services.brazilData import request_regions_covid_data, request_states_covid_data
+from flask import Blueprint, jsonify
 
 brazil = Blueprint("brazil", __name__)
 
@@ -8,6 +8,13 @@ brazil = Blueprint("brazil", __name__)
 """
 
 
-@brazil.route("/brazil", methods=['GET'])
-def brazil_covid():
-    return request_brazil_covid_data()
+@brazil.route("/regions", methods=['GET'])
+def brazil_covid_regions():
+    regions_data = request_regions_covid_data()
+    return jsonify(regions_data)
+
+
+@brazil.route("/states", methods=['GET'])
+def brazil_covid_states():
+    states_data = request_states_covid_data()
+    return jsonify(states_data)

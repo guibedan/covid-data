@@ -6,10 +6,9 @@ from routes.world import world
 
 
 app = Flask(__name__)
-
 CORS(app)
 
 app.register_blueprint(brazil, url_prefix="/v1")
 app.register_blueprint(world, url_prefix="/v1")
 
-app.run(debug=True, port=5000)
+app.run(debug=True, port=8080)
