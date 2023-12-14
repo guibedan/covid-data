@@ -1,6 +1,8 @@
-from services.brazilData import request_regions_covid_data, request_states_covid_data
-from services.citysData import city_request
 from flask import Blueprint, jsonify, request
+
+from services.regions import RegionsService
+from services.states import StatesService
+from services.cities import CitiesService
 
 brazil = Blueprint("brazil", __name__)
 
@@ -11,13 +13,13 @@ brazil = Blueprint("brazil", __name__)
 
 @brazil.route("/regions", methods=['GET'])
 def regions():
-    regions_data = request_regions_covid_data()
+    regions_data = RegionsService().get_regions()
     return regions_data
 
 
 @brazil.route("/states", methods=['GET'])
 def states():
-    states_data = request_states_covid_data()
+    states_data = StatesService().get_states()
     return jsonify(states_data)
 
 
@@ -29,10 +31,10 @@ def paginate(data, page, per_page):
 
 @brazil.route("/citys", methods=['GET'])
 def citys():
-    citys_data = city_request('/Users/guibedan/PycharmProjects/covidData/services/data/table03.csv')
+    citys_data = CitiesService().get_cities()
 
     if not citys_data:
-        return jsonify({'message': 'No data available'}), 404
+        return jsonify({'message': 'No data_cities available'}), 404
 
     page = request.args.get('page', 1, type=int)
     items_per_page = 10
@@ -44,7 +46,7 @@ def citys():
     response = {
         'page': page,
         'total_pages': total_pages,
-        'data': current_data
+        'data_cities': current_data
     }
 
     return jsonify(response)
@@ -52,13 +54,13 @@ def citys():
 
 @brazil.route("/citys/all", methods=['GET'])
 def all_citys():
-    citys_data = city_request('/Users/guibedan/PycharmProjects/covidData/services/data/table03.csv')
+    citys_data = CitiesService().get_cities()
 
     if not citys_data:
-        return jsonify({'message': 'No data available'}), 404
+        return jsonify({'message': 'No data_cities available'}), 404
 
     response = {
-        'data': citys_data
+        'data_cities': citys_data
     }
 
     return jsonify(response)
