@@ -11,4 +11,4 @@ CORS(app)
 app.register_blueprint(brazil, url_prefix="/v1")
 app.register_blueprint(world, url_prefix="/v1")
 
-app.run(debug=True, port=8080)
+app.run(debug=True, port=5000)
