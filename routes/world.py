@@ -1,6 +1,6 @@
 from flask import Blueprint, jsonify
 
-from services.worldData import world_request
+from services.world import WorldService
 
 world = Blueprint("world", __name__)
 
@@ -11,5 +11,5 @@ world = Blueprint("world", __name__)
 
 @world.route("/world", methods=['GET'])
 def world_covid():
-    world_data = world_request()
+    world_data = WorldService().get_world()
     return jsonify(world_data)

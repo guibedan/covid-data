@@ -1,4 +1,5 @@
 import csv
+from services.cities import CitiesService
 
 
 def city_request(file_path):
@@ -9,4 +10,4 @@ def city_request(file_path):
         for row in reader:
             data_list.append(dict(row))
 
-    return data_list
+    CitiesService().add_cities(data_list)

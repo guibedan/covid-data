@@ -4,6 +4,8 @@ from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.chrome.options import Options
 
+from services.world import WorldService
+
 
 def world_request():
     options = Options()
@@ -48,4 +50,4 @@ def world_request():
         if len(all_country) == 237:
             break
 
-    return all_country
+    WorldService().add_world(all_country)

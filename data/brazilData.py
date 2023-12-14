@@ -4,6 +4,9 @@ from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.chrome.options import Options
 
+from services.states import StatesService
+from services.regions import RegionsService
+
 options = Options()
 options.add_argument('window-size=1920,1080')
 options.add_argument('--headless')
@@ -14,7 +17,7 @@ nav = webdriver.Chrome(options=options)
 nav.get(url)
 
 
-def request_regions_covid_data() -> list[dict]:
+def request_regions_covid_data() -> None:
     time.sleep(10)
 
     colaps = ('/html/body/app-root/ion-app/ion-router-outlet/app-home/ion-content/painel-geral-component/div/div['
@@ -28,17 +31,16 @@ def request_regions_covid_data() -> list[dict]:
 
     for i in range(0, len(covid_data), elements_per_set):
         data_dict = {
-            'região': region_name[i // elements_per_set].text,
-            'casos': covid_data[i].text,
-            'Óbitos': covid_data[i + 1].text,
-            'Incidência/100mil hab.': covid_data[i + 2].text,
-            'Mortalidade/100mil hab': covid_data[i + 3].text,
-            'Atualização': covid_data[i + 4].text
+            'name': region_name[i // elements_per_set].text,
+            'cases': covid_data[i].text,
+            'deaths': covid_data[i + 1].text,
+            'incidence': covid_data[i + 2].text,
+            'mortality': covid_data[i + 3].text,
         }
 
         data_dicts.append(data_dict)
 
-    return data_dicts
+    RegionsService().add_regions(data_dicts)
 
 
 def take_data(start, end):
@@ -50,12 +52,11 @@ def take_data(start, end):
 
     for i in range(0, len(covid_data), elements_per_set):
         data_dict = {
-            'estado': region_name[i // elements_per_set].text,
-            'casos': covid_data[i].text,
-            'Óbitos': covid_data[i + 1].text,
-            'Incidência/100mil hab.': covid_data[i + 2].text,
-            'Mortalidade/100mil hab': covid_data[i + 3].text,
-            'Atualização': covid_data[i + 4].text
+            'name': region_name[i // elements_per_set].text,
+            'cases': covid_data[i].text,
+            'deaths': covid_data[i + 1].text,
+            'incidence': covid_data[i + 2].text,
+            'mortality': covid_data[i + 3].text,
         }
 
         data_dicts.append(data_dict)
@@ -63,7 +64,7 @@ def take_data(start, end):
     return data_dicts[start:end]
 
 
-def request_states_covid_data() -> list[dict]:
+def request_states_covid_data() -> None:
     time.sleep(10)
 
     states_data = []
@@ -93,4 +94,4 @@ def request_states_covid_data() -> list[dict]:
     nav.find_element(By.XPATH, sudeste).click()
     states_data = states_data + take_data(6, 10)
 
-    return states_data
+    StatesService().add_state(states_data)
