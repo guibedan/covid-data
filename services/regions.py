@@ -20,8 +20,9 @@ class RegionsService:
                 region["incidence"] = float(region["incidence"].replace(",", "."))
                 region["mortality"] = float(region["mortality"].replace(",", "."))
 
+                AddRegions().load(region)
                 self.repository.add_regions(region)
-            except ValueError as e:
+            except ValidationError as e:
                 print(f"Erro ao adicionar a region {region['name']}: {e}")
 
 

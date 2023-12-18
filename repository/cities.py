@@ -9,7 +9,9 @@ class CitiesRepository:
 
     def get_cities(self) -> list:
         query = """
-            SELECT name, cases, deaths, updated_at FROM cities
+            SELECT cities.name AS city_name, cities.cases, cities.deaths, states.name AS state_name, cities.type_region, cities.updated_at 
+            FROM cities
+            INNER JOIN states ON cities.state_id = states.id;
         """
         result = self.db.get(query)
         return list(
@@ -18,34 +20,33 @@ class CitiesRepository:
                     "name": item[0],
                     "cases": item[1],
                     "deaths": item[2],
-                    "updated_at": item[3]
+                    "UF": item[3],
+                    "type_region": item[4],
+                    "updated_at": item[5]
                 },
                 result,
             )
         )
 
-    def add_cities(self, cities: dict) -> None:
-
+    def add_cities(self, city: dict) -> None:
         query = """
-            INSERT INTO cities (id, name, state_id, cases, deaths)
-            VALUES (%s, %s, %s, %s, %s, %s, %s)
+            INSERT INTO cities (id, name, state_id, cases, deaths, type_region)
+            VALUES (%s, %s, %s, %s, %s, %s)
         """
 
-        for city in cities:
-            state = self.db.get("""
+        state = self.db.get("""
                                 SELECT id FROM states WHERE name = %s
                             """,
-                                (str(city["UF"]),),)
+                            (str(city["state_id"]),), )
 
-            print(state)
-
-            self.db.execute(
-                query,
-                (
-                    str(uuid4()),
-                    city["Município"],
-                    str(state[0]),
-                    city["CasosAcumulados"],
-                    city["ObitosAcumulados"]
-                ),
-            )
+        self.db.execute(
+            query,
+            (
+                str(uuid4()),
+                city["name"],
+                str(state[0][0]),
+                city["cases"],
+                city["deaths"],
+                city["type_region"]
+            ),
+        )
