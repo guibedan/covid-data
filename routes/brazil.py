@@ -11,13 +11,13 @@ brazil = Blueprint("brazil", __name__)
 """
 
 
-@brazil.route("/regions", methods=['GET'])
+@brazil.route("/brazil/regions", methods=['GET'])
 def regions():
     regions_data = RegionsService().get_regions()
-    return regions_data
+    return jsonify(regions_data)
 
 
-@brazil.route("/states", methods=['GET'])
+@brazil.route("/brazil/states", methods=['GET'])
 def states():
     states_data = StatesService().get_states()
     return jsonify(states_data)
@@ -29,7 +29,7 @@ def paginate(data, page, per_page):
     return data[start:end]
 
 
-@brazil.route("/citys", methods=['GET'])
+@brazil.route("/brazil/cities", methods=['GET'])
 def citys():
     citys_data = CitiesService().get_cities()
 
@@ -52,7 +52,7 @@ def citys():
     return jsonify(response)
 
 
-@brazil.route("/citys/all", methods=['GET'])
+@brazil.route("/brazil/cities/all", methods=['GET'])
 def all_citys():
     citys_data = CitiesService().get_cities()
 

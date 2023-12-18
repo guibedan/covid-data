@@ -1,7 +1,7 @@
-import re
-from uuid import uuid4
 from repository.states import StatesRepository
+
 from marshmallow import ValidationError
+
 from schemas.states import AddStates
 
 
