@@ -1,4 +1,4 @@
-# COVID Data Dashboard
+# COVID Data
 
 ## Description
 This project is a COVID-19 data visualization dashboard for Brazil, which retrieves real-time information from the official website of the Ministry of Health. It includes scripts for automatic data collection and an API for retrieving the obtained data.
@@ -15,8 +15,8 @@ This project is a COVID-19 data visualization dashboard for Brazil, which retrie
 1. **Clone this repository:**
 
    ```bash
-   git clone https://github.com/seu-usuario/covid-data-dashboard.git
-   cd covid-data-dashboard
+   git clone https://github.com/guibedan/covid-data.git
+   cd covid-data
    ```
 2. **Install the dependencies:**
 
