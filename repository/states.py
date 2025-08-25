@@ -1,5 +1,4 @@
 from infra.postgres import PostgresDatabase
-from uuid import uuid4
 
 
 class StatesRepository:
@@ -9,7 +8,7 @@ class StatesRepository:
 
     def get_states(self) -> list:
         query = """
-            SELECT id, name, cases, deaths, incidence, mortality, updated_at FROM states
+            SELECT id, name, cases, deaths, population, incidence, mortality, updated_at FROM states
         """
         result = self.db.get(query)
         return list(
@@ -19,9 +18,10 @@ class StatesRepository:
                     "name": item[1],
                     "cases": item[2],
                     "deaths": item[3],
-                    "incidence": item[4],
-                    "mortality": item[5],
-                    "updated_at": item[6],
+                    "population": item[4],
+                    "incidence": item[5],
+                    "mortality": item[6],
+                    "updated_at": item[7],
                 },
                 result,
             )
@@ -29,17 +29,19 @@ class StatesRepository:
 
     def add_states(self, state: dict) -> None:
         query = """
-                INSERT INTO states (id, name, cases, deaths, incidence, mortality)
-                VALUES (%s, %s, %s, %s, %s, %s)
+                INSERT INTO states (name, cases, deaths, population, incidence, mortality)
+                VALUES (%s, %s, %s, %s, %s, %s, %s)
+                ON DUPLICATE KEY UPDATE
+                name=%s, cases=%s, deaths=%s, population=%s, incidence=%s, mortality=%s
             """
 
         self.db.execute(
             query,
             (
-                str(uuid4()),
                 state["name"],
                 state["cases"],
                 state["deaths"],
+                state["population"],
                 state["incidence"],
                 state["mortality"]
             ),

@@ -1,5 +1,4 @@
 from infra.postgres import PostgresDatabase
-from uuid import uuid4
 
 
 class RegionsRepository:
@@ -9,7 +8,7 @@ class RegionsRepository:
 
     def get_regions(self) -> list:
         query = """
-            SELECT id, name, cases, deaths, incidence, mortality, updated_at FROM regions
+            SELECT id, name, cases, deaths, population, incidence, mortality, updated_at FROM regions
         """
         result = self.db.get(query)
         return list(
@@ -19,9 +18,10 @@ class RegionsRepository:
                     "name": item[1],
                     "cases": item[2],
                     "deaths": item[3],
-                    "incidence": item[4],
-                    "mortality": item[5],
-                    "updated_at": item[6],
+                    "population": item[4],
+                    "incidence": item[5],
+                    "mortality": item[6],
+                    "updated_at": item[7],
                 },
                 result,
             )
@@ -29,17 +29,19 @@ class RegionsRepository:
 
     def add_regions(self, regions: dict) -> None:
         query = """
-                INSERT INTO regions (id, name, cases, deaths, incidence, mortality)
+                INSERT INTO regions (name, cases, deaths, population, incidence, mortality)
                 VALUES (%s, %s, %s, %s, %s, %s)
+                ON DUPLICATE KEY UPDATE
+                name=%s, cases=%s, deaths=%s, population=%s, incidence=%s, mortality=%s
             """
 
         self.db.execute(
             query,
             (
-                str(uuid4()),
                 regions["name"],
                 regions["cases"],
                 regions["deaths"],
+                regions["population"],
                 regions["incidence"],
                 regions["mortality"]
             ),

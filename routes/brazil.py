@@ -1,8 +1,5 @@
-from flask import Blueprint, jsonify, request
-
-from services.regions import RegionsService
-from services.states import StatesService
-from services.cities import CitiesService
+from flask import Blueprint, jsonify
+from services.brazil import BrazilService
 
 brazil = Blueprint("brazil", __name__)
 
@@ -13,13 +10,13 @@ brazil = Blueprint("brazil", __name__)
 
 @brazil.route("/brazil/regions", methods=['GET'])
 def regions():
-    regions_data = RegionsService().get_regions()
+    regions_data = BrazilService().get_regions()
     return jsonify(regions_data)
 
 
 @brazil.route("/brazil/states", methods=['GET'])
 def states():
-    states_data = StatesService().get_states()
+    states_data = BrazilService().get_states()
     return jsonify(states_data)
 
 
@@ -29,32 +26,27 @@ def paginate(data, page, per_page):
     return data[start:end]
 
 
-@brazil.route("/brazil/cities", methods=['GET'])
-def citys():
-    citys_data = CitiesService().get_cities()
+@brazil.route("/brazil/cities/<page>", methods=['GET'])
+def cities(page: int):
+
+    page = int(page) if page else 1
+
+    citys_data = BrazilService().get_cities(page)
 
     if not citys_data:
         return jsonify({'message': 'No data_cities available'}), 404
 
-    page = request.args.get('page', 1, type=int)
-    items_per_page = 10
-
-    current_data = paginate(citys_data, page, items_per_page)
-
-    total_pages = len(citys_data) // items_per_page + (len(citys_data) % items_per_page > 0)
-
     response = {
         'page': page,
-        'total_pages': total_pages,
-        'data_cities': current_data
+        'data_cities': citys_data
     }
 
     return jsonify(response)
 
 
 @brazil.route("/brazil/cities/all", methods=['GET'])
-def all_citys():
-    citys_data = CitiesService().get_cities()
+def all_cities():
+    citys_data = BrazilService().get_cities()
 
     if not citys_data:
         return jsonify({'message': 'No data_cities available'}), 404
