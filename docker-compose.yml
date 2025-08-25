@@ -7,7 +7,7 @@ services:
     environment:
       POSTGRES_PASSWORD: 123
       POSTGRES_USER: postgres
-      POSTGRES_DB: Data_covid
+      POSTGRES_DB: covid-data
       TZ: America/Sao_Paulo
       POSTGRES_INITDB_ARGS: '--encoding=UTF-8 --lc-collate=C --lc-ctype=C'
     ports:
