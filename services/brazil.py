@@ -3,9 +3,11 @@ from repository.regions import RegionsRepository
 from repository.states import StatesRepository
 
 from data.regions_states import RegionsAndStatesData
+from data.cities import CitiesData
 
 from schemas.regions import AddRegions
 from schemas.states import AddStates
+from schemas.cities import AddCities
 
 from marshmallow import ValidationError
 import logging
@@ -18,39 +20,44 @@ class BrazilService:
         self.states_repository = StatesRepository()
 
         self.regions_states_scrapper = RegionsAndStatesData()
-        self.cities_scrapper = RegionsAndStatesData()
+        self.cities_scrapper = CitiesData()
+
+    def get_top_cities(self) -> list:
+        return self.cities_repository.get_top_cities()
 
     def get_cities(self, page: int = None) -> list:
         return self.cities_repository.get_cities(page)
 
-    def add_cities(self, cities: list[dict]) -> str:
-        try:
-            for city in cities:
-                city["CasosAcumulados"] = int(city["CasosAcumulados"].replace(".", ""))
-                city["ObitosAcumulados"] = int(city["ObitosAcumulados"].replace(".", ""))
+    def add_cities(self) -> str:
+        logging.info("Excetuing addCities Service")
+        response = self.cities_scrapper.cities_request()
 
-                data_city = {
-                    'name': city['Município'],
-                    'state_id': city['UF'],
-                    'cases': city['CasosAcumulados'],
-                    'deaths': city['ObitosAcumulados'],
-                    'type_region': city['Metro/Interior']
+        logging.info("Validated an saving data on database")
+        for _, row in response.iterrows():
+            try:
+                data_row = {
+                    "city": row["city"],
+                    "state": row["state"],
+                    "city_ibge_code": str(int(row["city_ibge_code"])),
+                    "population": int(row["estimated_population"]),
+                    "cases": int(row["last_available_confirmed"]),
+                    "deaths": int(row["last_available_deaths"]),
+                    "incidence": float(row["last_available_confirmed_per_100k_inhabitants"]),
+                    "mortality": float(row["last_available_death_rate"]),
                 }
-
-                #AddCities().load(city)
-                self.repository.add_cities(data_city)
-        except ValidationError as err:
-            return err.messages
-
-        return 'success'
+                AddCities().load(data_row)
+                self.cities_repository.add_cities(data_row)
+            except ValidationError as err:
+                logging.error(err)
 
     def get_regions(self):
         return self.regions_repository.get_regions()
-    
+
     def get_states(self):
         return self.states_repository.get_states()
 
     def save_states_and_regions(self):
+        logging.info("Excetuing save_states_and_regions Service")
         return_data = self.regions_states_scrapper.regions_states_request()
 
         for region, data in return_data["regions"].items():
@@ -58,17 +65,17 @@ class BrazilService:
             save_data["name"] = region
 
             try:
-                AddRegions(save_data)
+                AddRegions().load(save_data)
                 self.regions_repository.add_regions(save_data)
             except ValidationError as err:
                 logging.error(err)
 
-        for state in return_data["states"].items():
-            save_data = data.copy()
-            save_data["name"] = state
+        for name, state in return_data["states"].items():
+            save_data = state.copy()
+            save_data["name"] = name
 
             try:
-                AddStates(save_data)
+                AddStates().load(save_data)
                 self.states_repository.add_states(save_data)
             except ValidationError as err:
                 logging.error(err)

@@ -20,12 +20,6 @@ def states():
     return jsonify(states_data)
 
 
-def paginate(data, page, per_page):
-    start = (page - 1) * per_page
-    end = start + per_page
-    return data[start:end]
-
-
 @brazil.route("/brazil/cities/<page>", methods=['GET'])
 def cities(page: int):
 
@@ -47,6 +41,19 @@ def cities(page: int):
 @brazil.route("/brazil/cities/all", methods=['GET'])
 def all_cities():
     citys_data = BrazilService().get_cities()
+
+    if not citys_data:
+        return jsonify({'message': 'No data_cities available'}), 404
+
+    response = {
+        'data_cities': citys_data
+    }
+
+    return jsonify(response)
+
+@brazil.route("/brazil/cities/top", methods=['GET'])
+def top_cities():
+    citys_data = BrazilService().get_top_cities()
 
     if not citys_data:
         return jsonify({'message': 'No data_cities available'}), 404

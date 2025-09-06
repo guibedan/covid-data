@@ -1,14 +1,14 @@
 import schedule
 from time import sleep
-from data.loadData import load, update
-
-load()
+from services.update import UpdateService
 
 
 def rpa_worker():
     print("[INFO] RPA Process", flush=True)
-    # schedule.every(1).week.do(update)
-    schedule.every(5).minute.do(update)
+    service = UpdateService()
+    service.update()
+
+    schedule.every(1).week.do(service.update)
 
     while True:
         try:

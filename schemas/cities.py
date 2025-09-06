@@ -2,8 +2,11 @@ from marshmallow import Schema, fields, validate
 
 
 class AddCities(Schema):
-    name = fields.String(required=True, validate=validate.Length(min=1, max=255))
-    state_id = fields.UUID(required=True)
+    city = fields.String(required=True, validate=validate.Length(min=1, max=255))
+    state = fields.String(required=True)
+    city_ibge_code = fields.String(required=True)
+    population = fields.Integer(required=True)
     cases = fields.Integer(required=True)
     deaths = fields.Integer(required=True)
-    type_region = fields.String(required=True, validate=validate.Length(min=1, max=50))
+    incidence = fields.Float(required=True)
+    mortality = fields.Float(required=True)

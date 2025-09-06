@@ -41,5 +41,6 @@ This project is a COVID-19 data visualization dashboard for Brazil, which retrie
 - **/v1/world:** Obtains data from all countrys in world.
 - **/v2/regions:** Obtains data from all regions of Brazil.
 - **/v2/states:** Obtains data from all states in Brazil.
-- **/v1/cities/{page}:** Obtains data from all cities in Brazil formatted in pages.
-- **/v1/cities/all:** Obtains data from all cities in Brazil formatted in list.
+- **/v2/cities/{page}:** Obtains data from all cities in Brazil formatted in pages.
+- **/v2/cities/all:** Obtains data from all cities in Brazil formatted in list.
+- **/v2/cities/top:** Obtains data from the top 10 cities with the most cases

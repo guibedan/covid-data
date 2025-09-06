@@ -8,26 +8,55 @@ class CitiesRepository:
 
     def get_cities(self, page: int) -> list:
         query = """
-            SELECT cities.name AS city_name, cities.cases, cities.deaths, states.name AS state_name, cities.type_region, cities.updated_at 
+            SELECT city, state, city_ibge_code, population, cases, deaths, incidence, mortality, updated_at
             FROM cities
-            INNER JOIN states ON cities.state_id = states.id;
+            ORDER BY city, state ASC
         """
 
         if page:
             query += f"""
                 LIMIT 10 OFFSET {10*(page-1)}
-            """ 
+            """
 
         result = self.db.get(query)
         return list(
             map(
                 lambda item: {
-                    "name": item[0],
-                    "cases": item[1],
-                    "deaths": item[2],
-                    "UF": item[3],
-                    "type_region": item[4],
-                    "updated_at": item[5]
+                    "city": item[0],
+                    "state": item[1],
+                    "city_ibge_code": item[2],
+                    "population": item[3],
+                    "cases": item[4],
+                    "deaths": item[5],
+                    "incidence": item[6],
+                    "mortality": item[7],
+                    "updated_at": item[8]
+                },
+                result,
+            )
+        )
+
+    def get_top_cities(self) -> list:
+        query = """
+            SELECT city, state, city_ibge_code, population, cases, deaths, incidence, mortality, updated_at
+            FROM cities
+            ORDER BY cases DESC
+            LIMIT 10
+        """
+
+        result = self.db.get(query)
+        return list(
+            map(
+                lambda item: {
+                    "city": item[0],
+                    "state": item[1],
+                    "city_ibge_code": item[2],
+                    "population": item[3],
+                    "cases": item[4],
+                    "deaths": item[5],
+                    "incidence": item[6],
+                    "mortality": item[7],
+                    "updated_at": item[8]
                 },
                 result,
             )
@@ -35,22 +64,30 @@ class CitiesRepository:
 
     def add_cities(self, city: dict) -> None:
         query = """
-            INSERT INTO cities (id, name, state_id, cases, deaths, type_region)
-            VALUES (%s, %s, %s, %s, %s)
+            INSERT INTO cities (
+                city, state, city_ibge_code, population, cases, deaths, incidence, mortality
+            ) VALUES (
+                %s, %s, %s, %s, %s, %s, %s, %s
+            )
+            ON CONFLICT (city_ibge_code) DO UPDATE
+            SET population = EXCLUDED.population,
+                cases = EXCLUDED.cases,
+                deaths = EXCLUDED.deaths,
+                incidence = EXCLUDED.incidence,
+                mortality = EXCLUDED.mortality,
+                updated_at = CURRENT_TIMESTAMP;
         """
-
-        state = self.db.get("""
-                                SELECT id FROM states WHERE name = %s
-                            """,
-                            (str(city["state_id"]),), )
 
         self.db.execute(
             query,
             (
-                city["name"],
-                str(state[0][0]),
+                city["city"],
+                city["state"],
+                city["city_ibge_code"],
+                city["population"],
                 city["cases"],
                 city["deaths"],
-                city["type_region"]
+                city["incidence"],
+                city["mortality"]
             ),
         )

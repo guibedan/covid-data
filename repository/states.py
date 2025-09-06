@@ -30,9 +30,13 @@ class StatesRepository:
     def add_states(self, state: dict) -> None:
         query = """
                 INSERT INTO states (name, cases, deaths, population, incidence, mortality)
-                VALUES (%s, %s, %s, %s, %s, %s, %s)
-                ON DUPLICATE KEY UPDATE
-                name=%s, cases=%s, deaths=%s, population=%s, incidence=%s, mortality=%s
+                VALUES (%s, %s, %s, %s, %s, %s)
+                ON CONFLICT (name) DO UPDATE
+                SET cases = EXCLUDED.cases,
+                    deaths = EXCLUDED.deaths,
+                    population = EXCLUDED.population,
+                    incidence = EXCLUDED.incidence,
+                    mortality = EXCLUDED.mortality;
             """
 
         self.db.execute(
